@@ -1,5 +1,6 @@
 package org.example.atm.controller;
 
+import org.example.atm.model.Transaction;
 import org.example.atm.service.ATMService;
 import org.example.atm.service.InsufficientFundsException;
 import org.example.atm.service.InvalidPinException;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/atm")
@@ -22,7 +24,9 @@ public class ATMController {
     }
 
     @GetMapping("/balance")
-    public ResponseEntity<BigDecimal> checkBalance(@RequestParam String accountNumber, @RequestParam String pin) throws AccountNotFoundException, InvalidPinException {
+    public ResponseEntity<BigDecimal> checkBalance(
+            @RequestParam String accountNumber,
+            @RequestParam String pin) throws AccountNotFoundException, InvalidPinException {
         BigDecimal balance = atmService.checkBalance(accountNumber, pin);
         return ResponseEntity.ok(balance);
     }
@@ -47,5 +51,22 @@ public class ATMController {
         return ResponseEntity.ok("withdrawn: "+amount+"\nBalance: "+atmService.checkBalance(accountNumber,pin)+"\n");
     }
 
+    @PostMapping("/transfer")
+    public ResponseEntity<String> transfer(
+            @RequestParam String fromAccountNumber,
+            @RequestParam String pin,
+            @RequestParam String toAccountNumber,
+            @RequestParam BigDecimal amount) throws InsufficientFundsException, AccountNotFoundException, InvalidPinException {
+        atmService.transfer(fromAccountNumber, pin, toAccountNumber, amount );
+        return ResponseEntity.ok("Transfer successful"+"\nBalance: "+atmService.checkBalance(fromAccountNumber,pin)+"\n");
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity<List<Transaction>> getTransactions(
+            @RequestParam String accountNumber,
+            @RequestParam String pin) throws AccountNotFoundException, InvalidPinException {
+        List<Transaction> transactions = atmService.getTransactionHistory(accountNumber,pin);
+        return ResponseEntity.ok(transactions);
+    }
 
 }
