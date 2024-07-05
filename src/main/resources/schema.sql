@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS account (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    account_number VARCHAR(255) NOT NULL,
+    pin VARCHAR(255) NOT NULL,
+    balance DECIMAL(19, 2) NOT NULL
+    );
